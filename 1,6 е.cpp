@@ -10,6 +10,7 @@ float **rev;
 int r = 3;
     public:
     slc();
+    ~slc();
 void show();
 void doorev();
 void full();
@@ -35,13 +36,12 @@ slc::slc(){
         for(int j = 0; j < r;j++){
             rev[i][j] = (i == j)? 1:0;
 
-
     }
 }
 void slc::show(){
     cout << "rev" << endl;
     for(int i = 0; i < this->r; i++ ){
-        for(int j = 0; j < this->r; j++ )
+        for(int j = 0; j < this->r+1; j++ )
             cout << fixed << setprecision(3) << this->rev[i][j] << ' ';
             cout << endl;
     }
@@ -57,13 +57,24 @@ void slc::show(){
 }
 void slc::doorev(){
     float *buf1, *buf2, el;
-    float **copymass = new float*[r];
+    float **copymass = new float*[r+1];
 
     for(int j = 0; j < r; j++)
         copymass[j] = new float[r];
-        for(int i = 0;i < this->r; i++ )
+        for(int i = 0;i < this->r; i++ ){
         for(int j = 0; j < this->r; j++ )
             copymass[i][j] = mass[i][j];
+        }
+
+       for(int j = 1; j < r; j++)
+       if(copymass[0][0]<copymass[j][0]){
+        buf1=copymass[j];
+        buf2=rev[j];
+        copymass[j]=copymass[0];
+        rev[j]=rev[0];
+        copymass[0]=buf1;
+        rev[0]=buf2;
+       }
 
     for(int i = 0; i < this->r; i++ ){
             rev[i] = del(rev[i], copymass[i][i], r);
@@ -126,6 +137,20 @@ void slc::test()
         cout << endl;
     }
 
+}
+
+slc::~slc()
+{
+    if ( this->r != 0 ) {
+        for ( auto i = 0; i < r; ++i ) {
+            delete [] this->mass[i];
+            delete [] this->rev[i];
+        }
+        delete [] mass;
+        delete [] rev;
+        this->mass = nullptr;
+        this->rev = nullptr;
+    }
 }
 int main()
 {
